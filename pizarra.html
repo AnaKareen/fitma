@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Firma</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .modal {
+            display: none; /* Ocultar el modal por defecto */
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            text-align: center;
+        }
+
+        canvas {
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <button id="addSignatureBtn">Agregar firma</button>
+
+    <div id="signatureModal" class="modal">
+        <div class="modal-content">
+            <canvas id="signatureCanvas" width="400" height="200"></canvas>
+            <br>
+            <button id="saveSignatureBtn">Guardar firma</button>
+            <button id="clearSignatureBtn">Limpiar</button>
+            <button id="closeModalBtn">Cerrar</button>
+        </div>
+    </div>
+
+    <script>
+        const addSignatureBtn = document.getElementById('addSignatureBtn');
+        const signatureModal = document.getElementById('signatureModal');
+        const signatureCanvas = document.getElementById('signatureCanvas');
+        const saveSignatureBtn = document.getElementById('saveSignatureBtn');
+        const clearSignatureBtn = document.getElementById('clearSignatureBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+
+        let isDrawing = false;
+        const ctx = signatureCanvas.getContext('2d');
+
+        // Abre el modal al hacer clic en el botón
+        addSignatureBtn.addEventListener('click', () => {
+            signatureModal.style.display = 'block';
+            ctx.clearRect(0, 0, signatureCanvas.width, signatureCanvas.height); // Limpiar el canvas
+        });
+
+        // Cierra el modal
+        closeModalBtn.addEventListener('click', () => {
+            signatureModal.style.display = 'none';
+        });
+
+        // Manejo de eventos para dibujar en el canvas
+        signatureCanvas.addEventListener('mousedown', (e) => {
+            isDrawing = true;
+            ctx.moveTo(e.offsetX, e.offsetY);
+        });
+
+        signatureCanvas.addEventListener('mousemove', (e) => {
+            if (isDrawing) {
+                ctx.lineTo(e.offsetX, e.offsetY);
+                ctx.stroke();
+            }
+        });
+
+        signatureCanvas.addEventListener('mouseup', () => {
+            isDrawing = false;
+            ctx.beginPath();
+        });
+
+        // Guardar la firma como PNG
+        saveSignatureBtn.addEventListener('click', () => {
+            const dataURL = signatureCanvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.href = dataURL;
+            link.download = 'firma.png';
+            link.click();
+        });
+
+        // Limpiar el canvas
+        clearSignatureBtn.addEventListener('click', () => {
+            ctx.clearRect(0, 0, signatureCanvas.width, signatureCanvas.height); // Limpiar el canvas
+        });
+    </script>
+</body>
+</html>
